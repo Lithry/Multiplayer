@@ -5,11 +5,22 @@ using UnityEngine.Networking;
 
 public class BulletController : NetworkBehaviour {
 	private Transform trans;
-	private Rigidbody rb;
-	// Use this for initialization
+	public float speed = 25.0f;
+	public int dmg = 10;
+
 	void Start () {
-		rb = GetComponent<Rigidbody>();
-		rb.velocity = transform.forward * 20.0f;
-		Destroy(gameObject, 2);
+		trans = transform;
+		GetComponent<Rigidbody2D>().velocity = trans.right * speed;
+		Destroy(gameObject, 1.5f);
 	}
+
+	void OnTriggerEnter2D(Collider2D coll) {
+        if (coll.gameObject.tag == "Player"){
+			Debug.Log("Bullet hit!");
+			coll.transform.parent.GetComponent<Health>().ReciveDamage(dmg);
+			Destroy(gameObject);
+		}
+
+        
+    }
 }

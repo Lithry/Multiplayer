@@ -1,57 +1,49 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour {
 	private Transform trans;
-	public GameObject gunPoint;
-	public GameObject bullet;
-	public Image healthBar;
-	private int health;
-	
+	private Transform bodyTrans;
+	private Vector3 lookAt;
+	private Vector2 direction;
+	public float speed = 6.0f;
+	public GameObject gunTip;
+	public GameObject bulletPrefab;
 
 	void Awake () {
 		trans = transform;
-		health = 100;
+		bodyTrans = trans.Find("Body").transform;
 	}
 	
 	void Update () {
 		if (!isLocalPlayer)
 			return;
 
-		healthBar.fillAmount = health / 100;
+		Movement();
 
-		var x = Input.GetAxis("Horizontal") * Time.deltaTime * 150.0f;
-
-		trans.Rotate(0, x, 0);
-		trans.Translate(Vector3.forward * Input.GetAxisRaw("Vertical") * Time.deltaTime * 3.0f);
-		
 		if (Input.GetMouseButtonDown(0)){
 			CmdShoot();
 		}
-		
+	}
 
+	private void Movement(){
+		lookAt = Input.mousePosition - Camera.main.WorldToScreenPoint(trans.position);
+        float angle = (-Mathf.Atan2(lookAt.x, lookAt.y) * Mathf.Rad2Deg) + 90;
+        bodyTrans.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+		direction = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+		trans.Translate(direction.normalized * speed * Time.deltaTime, Space.World);
 	}
 
 	[Command]
 	private void CmdShoot(){
-		NetworkServer.Spawn(Instantiate(bullet, gunPoint.transform.position, gunPoint.transform.rotation));
+		NetworkServer.Spawn(Instantiate(bulletPrefab, gunTip.transform.position, bodyTrans.rotation));
 	}
 
 	public override void OnStartLocalPlayer(){
-		GetComponent<MeshRenderer>().material.color = Color.blue;
+		bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+		CameraController.instance.Set(trans);
 	}
-
-	void OnCollisionEnter(Collision collision)
-    {
-        if (collision.transform.tag == "Bullet")
-        {
-			Destroy(collision.transform.gameObject);
-            health -= 10;
-			if (health <= 0)
-				Destroy(gameObject);
-        }
-    }
 }
