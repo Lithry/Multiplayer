@@ -11,31 +11,37 @@ public class Health : NetworkBehaviour {
 	[SyncVar(hook = "SetHealthAmmount")]
 	private int currentHealth;
 	private Image barInside;
+	private NetworkStartPosition[] spawnPoints;
 
 	void Awake(){
 		barInside = healthBar.transform.Find("HealthColor").GetComponent<Image>();
 		currentHealth = maxHealth;
+		if (isLocalPlayer)
+        	spawnPoints = FindObjectsOfType<NetworkStartPosition>();
 	}
 
 	public void ReciveDamage(int dmg){
-		Debug.Log("Dmg: " + dmg);
 		if (!isServer)
 			return;
 
 		currentHealth -= dmg;
-		Debug.Log("Current Health: " + currentHealth);
 		if (currentHealth <= 0)
 			RpcRespawn();
 	}
 
 	private void SetHealthAmmount(int currentHealth){
-		barInside.fillAmount = (float)currentHealth / (float)maxHealth;
+		barInside.fillAmount = (float)((float)currentHealth / (float)maxHealth);
 	}
 
 	[ClientRpc]
 	void RpcRespawn(){
-		Debug.Log("Entro en Respawn");
-		transform.position = Vector3.zero;
+		Vector3 spawnPoint = Vector3.zero;
+
+		if (spawnPoints != null && spawnPoints.Length > 0){
+		    spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+		}
+
+		transform.position = spawnPoint;
 		currentHealth = maxHealth;
 	}
 }
