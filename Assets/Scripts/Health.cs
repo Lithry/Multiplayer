@@ -16,7 +16,7 @@ public class Health : NetworkBehaviour {
 	void Awake(){
 		barInside = healthBar.transform.Find("HealthColor").GetComponent<Image>();
 		currentHealth = maxHealth;
-		if (isLocalPlayer)
+		//if (isLocalPlayer)
         	spawnPoints = FindObjectsOfType<NetworkStartPosition>();
 	}
 
