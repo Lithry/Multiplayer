@@ -10,7 +10,7 @@ public class PlayerController : NetworkBehaviour {
 	private Vector2 direction;
 	public float speed = 6.0f;
 	public GameObject gunTip;
-	public GameObject bulletPrefab;
+	public GameObject magicPrefab;
 
 	void Awake () {
 		trans = transform;
@@ -30,7 +30,7 @@ public class PlayerController : NetworkBehaviour {
 
 	private void Movement(){
 		lookAt = Input.mousePosition - Camera.main.WorldToScreenPoint(trans.position);
-        float angle = (-Mathf.Atan2(lookAt.x, lookAt.y) * Mathf.Rad2Deg) + 90;
+        float angle = (-Mathf.Atan2(lookAt.x, lookAt.y) * Mathf.Rad2Deg);
         bodyTrans.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
 		direction = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
@@ -39,7 +39,7 @@ public class PlayerController : NetworkBehaviour {
 
 	[Command]
 	private void CmdShoot(){
-		NetworkServer.Spawn(Instantiate(bulletPrefab, gunTip.transform.position, bodyTrans.rotation));
+		NetworkServer.Spawn(Instantiate(magicPrefab, gunTip.transform.position, bodyTrans.rotation));
 	}
 
 	public override void OnStartLocalPlayer(){
