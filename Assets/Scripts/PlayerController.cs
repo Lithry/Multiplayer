@@ -15,6 +15,7 @@ public class PlayerController : NetworkBehaviour {
 	void Awake () {
 		trans = transform;
 		bodyTrans = trans.Find("Body").transform;
+		Blackboard.instance.players.Add(gameObject);
 	}
 	
 	void Update () {

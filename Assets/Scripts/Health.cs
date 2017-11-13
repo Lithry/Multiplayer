@@ -25,8 +25,12 @@ public class Health : NetworkBehaviour {
 			return;
 
 		currentHealth -= dmg;
-		if (currentHealth <= 0)
-			RpcRespawn();
+		if (currentHealth <= 0){
+			if (gameObject.tag == "Player")
+				RpcRespawn();
+			else
+				Destroy(gameObject);
+		}
 	}
 
 	private void SetHealthAmmount(int currentHealth){

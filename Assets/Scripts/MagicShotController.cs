@@ -11,15 +11,13 @@ public class MagicShotController : NetworkBehaviour {
 	void Start () {
 		trans = transform;
 		GetComponent<Rigidbody2D>().velocity = trans.up * speed;
-		Destroy(gameObject, 10f);
+		Destroy(gameObject, 1.5f);
 	}
 
 	void OnTriggerEnter2D(Collider2D coll) {
-        if (coll.gameObject.tag == "Player"){
-			coll.transform.parent.GetComponent<Health>().ReciveDamage(dmg);
+        if (coll.gameObject.tag == "Player" || coll.gameObject.tag == "Tower"){
+			coll.transform.GetComponent<Health>().ReciveDamage(dmg);
 			Destroy(gameObject);
 		}
-
-        
     }
 }
