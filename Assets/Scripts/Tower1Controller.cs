@@ -7,6 +7,9 @@ public class Tower1Controller : NetworkBehaviour {
 	public GameObject shootPrefab;
 	public GameObject aim;
 	public GameObject shootTip;
+	private GameObject ally;
+	public float delay = 3.0f;
+	public int distance = 12;
 	
 	private float timer;
 	// Use this for initialization
@@ -16,21 +19,32 @@ public class Tower1Controller : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (isLocalPlayer)
+			return;
+
 		timer += Time.deltaTime;
 
 		for (int i = 0; i < Blackboard.instance.players.Count; i++)	{
-			if (Vector3.Distance(transform.position, Blackboard.instance.players[i].transform.position) < 15 && timer > 3.0f){
-				Vector3 lookAt = Blackboard.instance.players[i].transform.position - transform.position;
-        		float angle = (-Mathf.Atan2(lookAt.x, lookAt.y) * Mathf.Rad2Deg);
-				aim.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-				CmdShoot(Blackboard.instance.players[i].transform.position);
+			if (Blackboard.instance.players[i] != ally && Vector3.Distance(transform.position, Blackboard.instance.players[i].transform.position) < distance && timer > delay){
+				Aim(Blackboard.instance.players[i].transform.position);
+				CmdShoot();
 			}
 		}
 	}
 
+	private void Aim(Vector3 target){
+		Vector3 lookAt = target - transform.position;
+        float angle = (-Mathf.Atan2(lookAt.x, lookAt.y) * Mathf.Rad2Deg);
+		aim.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+	}
+
 	[Command]
-	private void CmdShoot(Vector3 enemiPos){
+	private void CmdShoot(){
 		NetworkServer.Spawn(Instantiate(shootPrefab, shootTip.transform.position, aim.transform.rotation));
 		timer = 0.0f;
+	}
+
+	public void SetAlly(GameObject ally){
+		this.ally = ally;
 	}
 }

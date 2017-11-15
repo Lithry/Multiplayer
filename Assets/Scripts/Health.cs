@@ -17,7 +17,7 @@ public class Health : NetworkBehaviour {
 		barInside = healthBar.transform.Find("HealthColor").GetComponent<Image>();
 		currentHealth = maxHealth;
 		//if (isLocalPlayer)
-        	spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+        spawnPoints = FindObjectsOfType<NetworkStartPosition>();
 	}
 
 	public void ReciveDamage(int dmg){
@@ -31,6 +31,12 @@ public class Health : NetworkBehaviour {
 			else
 				Destroy(gameObject);
 		}
+	}
+
+	public void Heal(int heal){
+		currentHealth += heal;
+		if (currentHealth > maxHealth)
+			currentHealth = maxHealth;
 	}
 
 	private void SetHealthAmmount(int currentHealth){
