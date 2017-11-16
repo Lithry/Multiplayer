@@ -15,11 +15,16 @@ public class PlayerController : NetworkBehaviour {
 	public GameObject magicPrefab;
 	public GameObject tower1Prefab;
 	public GameObject tower2Prefab;
+	private SpriteRenderer sprite;
+	private int pId;
 
 	void Awake () {
 		trans = transform;
 		bodyTrans = trans.Find("Body").transform;
 		Blackboard.instance.players.Add(gameObject);
+		pId = Blackboard.instance.players.Count - 1;
+		if (isServer)
+			Blackboard.instance.serverId = pId;
 	}
 	
 	void Update () {
@@ -59,6 +64,7 @@ public class PlayerController : NetworkBehaviour {
 	private void CmdSpawnTower1(){
 		GameObject tower = Instantiate(tower1Prefab, trans.position, Quaternion.Euler(0, 0, 0));
 		tower.GetComponent<Tower1Controller>().SetAlly(this.gameObject);
+		tower.GetComponent<SpriteRenderer>().color = Color.blue;
 		NetworkServer.Spawn(tower);
 	}
 
@@ -66,30 +72,19 @@ public class PlayerController : NetworkBehaviour {
 	private void CmdSpawnTower2(){
 		GameObject tower = Instantiate(tower2Prefab, trans.position, Quaternion.Euler(0, 0, 0));
 		tower.GetComponent<Tower2Controller>().SetAlly(this.gameObject, this.gameObject.GetComponent<Health>());
+		tower.GetComponent<SpriteRenderer>().color = Color.blue;
 		NetworkServer.Spawn(tower);
 	}
 
 	public override void OnStartLocalPlayer(){
-		if ((Blackboard.instance.players.Count % 2) == 0){
-			/*bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = new Color(0.0f, 234.0f, 255.0f, 1.0f);
-			jewel.GetComponent<SpriteRenderer>().color = new Color(111.0f, 213.0f, 255.0f, 1.0f);
-			ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
- 			settings.startColor = new ParticleSystem.MinMaxGradient( new Color(111.0f, 213.0f, 255.0f, 1.0f) );*/
-			bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-			jewel.GetComponent<SpriteRenderer>().color = Color.red;
-			ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
- 			settings.startColor = new ParticleSystem.MinMaxGradient( Color.red );
-		}
-		else{
-			/*bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = new Color(255.0f, 239.0f, 17.0f, 1.0f);
-			jewel.GetComponent<SpriteRenderer>().color = new Color(255.0f, 251.0f, 111.0f, 1.0f);
-			ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
- 			settings.startColor = new ParticleSystem.MinMaxGradient( new Color(255.0f, 251.0f, 111.0f, 1.0f) );*/
-			bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
-			jewel.GetComponent<SpriteRenderer>().color = Color.blue;
-			ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
- 			settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
-		}
+		bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+		jewel.GetComponent<SpriteRenderer>().color = Color.blue;
+		ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
+ 		settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
+		
+		Blackboard.instance.client = gameObject;
+		if (isServer)
+			Blackboard.instance.server = gameObject;
 		CameraController.instance.Set(trans);
 	}
 }

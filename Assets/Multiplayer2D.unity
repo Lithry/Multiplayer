@@ -136,6 +136,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   players: []
+  server: {fileID: 0}
+  client: {fileID: 0}
 --- !u!4 &643037736
 Transform:
   m_ObjectHideFlags: 0

@@ -10,24 +10,30 @@ public class Tower1Controller : NetworkBehaviour {
 	private GameObject ally;
 	public float delay = 3.0f;
 	public int distance = 12;
-	
+	private SpriteRenderer ren;
+
 	private float timer;
 	// Use this for initialization
 	void Awake () {
+		ren = GetComponent<SpriteRenderer>();
 		timer = 0.0f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (isLocalPlayer)
+		if (isLocalPlayer){
+			ren.color = Color.blue;
 			return;
+		}
 
 		timer += Time.deltaTime;
 
-		for (int i = 0; i < Blackboard.instance.players.Count; i++)	{
-			if (Blackboard.instance.players[i] != ally && Vector3.Distance(transform.position, Blackboard.instance.players[i].transform.position) < distance && timer > delay){
-				Aim(Blackboard.instance.players[i].transform.position);
-				CmdShoot();
+		if (ally != null){
+			for (int i = 0; i < Blackboard.instance.players.Count; i++)	{
+				if (Blackboard.instance.players[i] != ally && Vector3.Distance(transform.position, Blackboard.instance.players[i].transform.position) < distance && timer > delay){
+					Aim(Blackboard.instance.players[i].transform.position);
+					CmdShoot();
+				}
 			}
 		}
 	}
@@ -46,5 +52,7 @@ public class Tower1Controller : NetworkBehaviour {
 
 	public void SetAlly(GameObject ally){
 		this.ally = ally;
+		if (ally == Blackboard.instance.client)
+			GetComponent<SpriteRenderer>().color = Color.blue;
 	}
 }
