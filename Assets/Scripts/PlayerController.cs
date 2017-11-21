@@ -31,7 +31,7 @@ public class PlayerController : NetworkBehaviour {
 
 	
 
-	void Awake () {
+	void Start () {
 		trans = transform;
 		bodyTrans = trans.Find("Body").transform;
 		wins = GameObject.Find("WinText").GetComponent<Text>();
@@ -40,21 +40,32 @@ public class PlayerController : NetworkBehaviour {
 		tower2d = GameObject.Find("Tower2Text").GetComponent<Text>();
 		tower1 = 10;
 		tower2 = 5;
-		rb = GetComponent<Rigidbody2D>();	
+		//Blackboard.instance.player1Wins = 0;
+		//Blackboard.instance.player2Wins = 0;
+		rb = GetComponent<Rigidbody2D>();
+		
+		if (isServer){
+			if (!isLocalPlayer){
+				bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+				jewel.GetComponent<SpriteRenderer>().color = Color.blue;
+				ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
+ 				settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
+			}
+		}
 	}
 	
 	void Update () {
 		if (!isLocalPlayer)
 			return;
 
-		if (pId == 1){
+		/*if (pId == 1){
 			wins.text = "Wins: " + Blackboard.instance.player1Wins.ToString();
 			lost.text = "Lost: " + Blackboard.instance.player2Wins.ToString();
 		}
 		else{
 			wins.text = "Wins: " + Blackboard.instance.player2Wins.ToString();
 			lost.text = "Lost: " + Blackboard.instance.player1Wins.ToString();
-		}
+		}*/
 
 		tower1d.text = "Tower1: " + tower1.ToString();
 		tower2d.text = "Tower2: " + tower2.ToString();
@@ -93,11 +104,14 @@ public class PlayerController : NetworkBehaviour {
 	[Command]
 	private void CmdSpawnTower1(int id){
 		GameObject tower;
-		if (id == 1)
-			tower = Instantiate(tower1Prefab1, trans.position, Quaternion.Euler(0, 0, 0));
-		else
-			tower = Instantiate(tower1Prefab2, trans.position, Quaternion.Euler(0, 0, 0));
-		tower.GetComponent<Tower1Controller>().SetAlly(this.gameObject);
+		if (id == 1){
+			tower = Instantiate(tower1Prefab1, gunTip.transform.position, Quaternion.Euler(0, 0, 0));
+			tower.GetComponent<Tower1Controller>().SetAlly(this.gameObject);
+		}
+		else{
+			tower = Instantiate(tower1Prefab2, gunTip.transform.position, Quaternion.Euler(0, 0, 0));
+			tower.GetComponent<Tower1Controller2>().SetAlly(this.gameObject);
+		}
 		NetworkServer.Spawn(tower);
 	}
 
@@ -105,52 +119,40 @@ public class PlayerController : NetworkBehaviour {
 	private void CmdSpawnTower2(int id){
 		GameObject tower;
 		if (id == 1)
-			tower = Instantiate(tower2Prefab1, trans.position, Quaternion.Euler(0, 0, 0));
+			tower = Instantiate(tower2Prefab1, gunTip.transform.position, Quaternion.Euler(0, 0, 0));
 		else
-			tower = Instantiate(tower2Prefab2, trans.position, Quaternion.Euler(0, 0, 0));
+			tower = Instantiate(tower2Prefab2, gunTip.transform.position, Quaternion.Euler(0, 0, 0));
 		tower.GetComponent<Tower2Controller>().SetAlly(this.gameObject, this.gameObject.GetComponent<Health>());
 		NetworkServer.Spawn(tower);
 	}
 
 	[Command]
-	private void CmdChangePlayerColor(int id){
-		for (int i = 0; i < Blackboard.instance.players.Count; i++){
-			if (Blackboard.instance.players[i] != null && Blackboard.instance.players[i].GetComponent<PlayerController>().GetId() == 2){
-				Blackboard.instance.players[i].GetComponent<PlayerController>().GetBody().gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
-				Blackboard.instance.players[i].GetComponent<PlayerController>().GetJewel().GetComponent<SpriteRenderer>().color = Color.blue;
-				ParticleSystem.MainModule settings = Blackboard.instance.players[i].GetComponent<PlayerController>().GetLigth().GetComponent<ParticleSystem>().main;
- 				settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
-
-				Blackboard.instance.players[i].GetComponent<PlayerController>().GetHealth().RpcSpawn(2);
-			}
-		}
+	private void CmdChangeTag(){
+		gameObject.tag = "Player2";
 	}
-
+	
 	public override void OnStartLocalPlayer(){
+		trans = transform;
+		bodyTrans = trans.Find("Body").transform;
+		CameraController.instance.Set(trans);
 		health = GetComponent<Health>();
-		Blackboard.instance.players.Add(gameObject);
 		
 		if (isServer){
 			pId = 1;
+			gameObject.tag = "Player1";
 		}
 		else{
 			pId = 2;
+			gameObject.tag = "Player2";
+			CmdChangeTag();
 		}
-		Blackboard.instance.player1Wins = 0;
-		Blackboard.instance.player2Wins = 0;
 
 		if (pId == 2){
 			bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
 			jewel.GetComponent<SpriteRenderer>().color = Color.blue;
 			ParticleSystem.MainModule settings = ligth.GetComponent<ParticleSystem>().main;
  			settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
-			int id = Blackboard.instance.players.Count - 1;
-			CmdChangePlayerColor(id);
-		}
-		
-
-		CameraController.instance.Set(trans);
-		
+		}	
 	}
 
 	public Transform GetBody(){

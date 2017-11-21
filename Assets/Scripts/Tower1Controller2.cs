@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Tower1Controller : NetworkBehaviour {
+public class Tower1Controller2 : NetworkBehaviour {
 	public GameObject shootPrefab;
 	public GameObject aim;
 	public GameObject shootTip;
@@ -24,11 +24,9 @@ public class Tower1Controller : NetworkBehaviour {
 
 		timer += Time.deltaTime;
 
-		if (ally != null){
-			if (target !=null && Vector3.Distance(transform.position, target.transform.position) < distance && timer > delay){
-				Aim(target.transform.position);
-				CmdShoot();
-			}
+		if (target !=null && Vector3.Distance(transform.position, target.transform.position) < distance && timer > delay){
+			Aim(target.transform.position);
+			CmdShoot();
 		}
 	}
 
@@ -49,7 +47,7 @@ public class Tower1Controller : NetworkBehaviour {
 	}
 
 	void OnTriggerStay2D(Collider2D coll){
-		if (target == null && coll.gameObject.tag == "Player2"){
+		if (target == null && coll.gameObject.tag == "Player1"){
 			target = coll.gameObject;
 		}
 	}
