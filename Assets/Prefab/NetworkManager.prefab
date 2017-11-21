@@ -69,8 +69,13 @@ MonoBehaviour:
   m_OnlineScene: 
   m_SpawnPrefabs:
   - {fileID: 1696893598640802, guid: 9f8280faec5ac1f4b937d8b03429367f, type: 2}
-  m_CustomConfig: 0
-  m_MaxConnections: 4
+  - {fileID: 1531118660043866, guid: 7974d046887ef7d488435c5e6e99b4ee, type: 2}
+  - {fileID: 1531118660043866, guid: e81e1ff1ed0b3be42a860512f36b9991, type: 2}
+  - {fileID: 1531118660043866, guid: ea1ffa5b95bf41245a643b8f1939767e, type: 2}
+  - {fileID: 1531118660043866, guid: fccc561c5eca5624a8afa4e322e08f15, type: 2}
+  - {fileID: 1635530288386212, guid: 57c4fd737342b68419284f1a92bd1b3b, type: 2}
+  m_CustomConfig: 1
+  m_MaxConnections: 1
   m_ConnectionConfig:
     m_PacketSize: 1440
     m_FragmentSize: 500
@@ -111,7 +116,7 @@ MonoBehaviour:
     m_MaxTimerTimeout: 12000
     m_MinNetSimulatorTimeout: 1
     m_MaxNetSimulatorTimeout: 12000
-  m_Channels: 
+  m_Channels: 0500000000000000
   m_UseWebSockets: 0
   m_UseSimulator: 0
   m_SimulatedLatency: 1

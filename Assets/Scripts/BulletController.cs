@@ -17,9 +17,7 @@ public class BulletController : NetworkBehaviour {
 	void OnTriggerEnter2D(Collider2D coll) {
         if (coll.gameObject.tag == "Player"){
 			coll.transform.parent.GetComponent<Health>().ReciveDamage(dmg);
-			Destroy(gameObject);
 		}
-
-        
+	Destroy(gameObject);
     }
 }

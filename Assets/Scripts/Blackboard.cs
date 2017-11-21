@@ -8,8 +8,7 @@ public class Blackboard : NetworkBehaviour{
 	public List<GameObject> players = new List<GameObject>();
 	public GameObject server;
 	public GameObject client;
-	[SyncVar]
-	public int serverId;
+
 
 	void Awake(){
 		instance = this;

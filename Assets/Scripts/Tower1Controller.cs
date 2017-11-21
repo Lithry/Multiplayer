@@ -10,19 +10,16 @@ public class Tower1Controller : NetworkBehaviour {
 	private GameObject ally;
 	public float delay = 3.0f;
 	public int distance = 12;
-	private SpriteRenderer ren;
 
 	private float timer;
 	// Use this for initialization
 	void Awake () {
-		ren = GetComponent<SpriteRenderer>();
 		timer = 0.0f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (isLocalPlayer){
-			ren.color = Color.blue;
 			return;
 		}
 
@@ -52,7 +49,5 @@ public class Tower1Controller : NetworkBehaviour {
 
 	public void SetAlly(GameObject ally){
 		this.ally = ally;
-		if (ally == Blackboard.instance.client)
-			GetComponent<SpriteRenderer>().color = Color.blue;
 	}
 }

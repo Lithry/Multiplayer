@@ -11,13 +11,24 @@ public class Health : NetworkBehaviour {
 	[SyncVar(hook = "SetHealthAmmount")]
 	private int currentHealth;
 	private Image barInside;
-	private NetworkStartPosition[] spawnPoints;
-
+	private NetworkStartPosition spawnPoint1;
+	private NetworkStartPosition spawnPoint2;
+	private PlayerController player;
 	void Awake(){
 		barInside = healthBar.transform.Find("HealthColor").GetComponent<Image>();
 		currentHealth = maxHealth;
-		//if (isLocalPlayer)
-        spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+		if (gameObject.tag == "Player"){
+			player = GetComponent<PlayerController>();
+		}
+        NetworkStartPosition[] spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+		for (int i = 0; i < spawnPoints.Length; i++)
+		{
+			if (i == 0)
+				spawnPoint1 = spawnPoints[i];
+			else
+				spawnPoint2 = spawnPoints[i];
+
+		}
 	}
 
 	public void ReciveDamage(int dmg){
@@ -26,8 +37,9 @@ public class Health : NetworkBehaviour {
 
 		currentHealth -= dmg;
 		if (currentHealth <= 0){
-			if (gameObject.tag == "Player")
-				RpcRespawn();
+			if (gameObject.tag == "Player"){
+				RpcRespawn(player.GetId());
+			}
 			else
 				Destroy(gameObject);
 		}
@@ -44,12 +56,29 @@ public class Health : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	void RpcRespawn(){
+	void RpcRespawn(int id){
 		Vector3 spawnPoint = Vector3.zero;
 
-		if (spawnPoints != null && spawnPoints.Length > 0){
-		    spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+		if (id == 1){
+			spawnPoint = spawnPoint1.transform.position;
 		}
+		else
+			spawnPoint = spawnPoint2.transform.position;
+
+		transform.position = spawnPoint;
+		currentHealth = maxHealth;
+		player.RestarTowers();
+	}
+
+	[ClientRpc]
+	public void RpcSpawn(int id){
+		Vector3 spawnPoint = Vector3.zero;
+
+		if (id == 1){
+			spawnPoint = spawnPoint1.transform.position;
+		}
+		else
+			spawnPoint = spawnPoint2.transform.position;
 
 		transform.position = spawnPoint;
 		currentHealth = maxHealth;

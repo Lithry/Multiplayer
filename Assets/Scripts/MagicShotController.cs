@@ -15,9 +15,16 @@ public class MagicShotController : NetworkBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D coll) {
-        if (coll.gameObject.tag == "Player" || coll.gameObject.tag == "Tower"){
+        if (coll.gameObject.tag == "Tower"){
 			coll.transform.GetComponent<Health>().ReciveDamage(dmg);
-			Destroy(gameObject);
 		}
+		Destroy(gameObject);
     }
+
+	void OnCollisionEnter2D(Collision2D coll){
+		if (coll.gameObject.tag == "Player"){
+			coll.transform.GetComponent<Health>().ReciveDamage(dmg);
+		}
+		Destroy(gameObject);
+	}
 }

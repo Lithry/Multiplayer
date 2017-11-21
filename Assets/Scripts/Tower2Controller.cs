@@ -11,17 +11,13 @@ public class Tower2Controller : NetworkBehaviour {
 	public float delay = 3.0f;
 	public int distance = 12;
 	public GameObject healEffect;
-	private SpriteRenderer ren;
 
 	void Awake () {
-		ren = GetComponent<SpriteRenderer>();
-
 		timer = 0.0f;
 	}
 	
 	void Update () {
 		if (isLocalPlayer){
-			ren.color = Color.blue;
 			return;
 		}
 
@@ -42,7 +38,5 @@ public class Tower2Controller : NetworkBehaviour {
 	public void SetAlly(GameObject ally, Health allyHealth){
 		this.ally = ally;
 		this.allyHealth = allyHealth;
-		if (ally == Blackboard.instance.client)
-			GetComponent<SpriteRenderer>().color = Color.blue;
 	}
 }
