@@ -27,7 +27,7 @@ public class Tower1Controller : NetworkBehaviour {
 
 		if (ally != null){
 			for (int i = 0; i < Blackboard.instance.players.Count; i++)	{
-				if (Blackboard.instance.players[i] != ally && Vector3.Distance(transform.position, Blackboard.instance.players[i].transform.position) < distance && timer > delay){
+				if (Blackboard.instance.players[i] !=null && Blackboard.instance.players[i] != ally && Vector3.Distance(transform.position, Blackboard.instance.players[i].transform.position) < distance && timer > delay){
 					Aim(Blackboard.instance.players[i].transform.position);
 					CmdShoot();
 				}

@@ -60,10 +60,13 @@ public class Health : NetworkBehaviour {
 		Vector3 spawnPoint = Vector3.zero;
 
 		if (id == 1){
+			Blackboard.instance.player2Wins++;
 			spawnPoint = spawnPoint1.transform.position;
 		}
-		else
+		else{
+			Blackboard.instance.player1Wins++;
 			spawnPoint = spawnPoint2.transform.position;
+		}
 
 		transform.position = spawnPoint;
 		currentHealth = maxHealth;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class PlayerController : NetworkBehaviour {
 	private Transform trans;
@@ -10,7 +11,7 @@ public class PlayerController : NetworkBehaviour {
 	private Vector2 direction;
 	public GameObject jewel;
 	public GameObject ligth;
-	public float speed = 6.0f;
+	public float speed = 400.0f;
 	public GameObject gunTip;
 	public GameObject magicPrefab;
 	public GameObject tower1Prefab1;
@@ -23,19 +24,40 @@ public class PlayerController : NetworkBehaviour {
 	private int tower1;
 	private int tower2;
 	private Rigidbody2D rb;
+	private Text wins;
+	private Text lost;
+	private Text tower1d;
+	private Text tower2d;
+
+	
 
 	void Awake () {
 		trans = transform;
 		bodyTrans = trans.Find("Body").transform;
+		wins = GameObject.Find("WinText").GetComponent<Text>();
+		lost = GameObject.Find("LostText").GetComponent<Text>();
+		tower1d = GameObject.Find("Tower1Text").GetComponent<Text>();
+		tower2d = GameObject.Find("Tower2Text").GetComponent<Text>();
 		tower1 = 10;
 		tower2 = 5;
-		rb = GetComponent<Rigidbody2D>();
-		Blackboard.instance.players.Add(gameObject);	
+		rb = GetComponent<Rigidbody2D>();	
 	}
 	
 	void Update () {
 		if (!isLocalPlayer)
 			return;
+
+		if (pId == 1){
+			wins.text = "Wins: " + Blackboard.instance.player1Wins.ToString();
+			lost.text = "Lost: " + Blackboard.instance.player2Wins.ToString();
+		}
+		else{
+			wins.text = "Wins: " + Blackboard.instance.player2Wins.ToString();
+			lost.text = "Lost: " + Blackboard.instance.player1Wins.ToString();
+		}
+
+		tower1d.text = "Tower1: " + tower1.ToString();
+		tower2d.text = "Tower2: " + tower2.ToString();
 
 		Movement();
 
@@ -61,7 +83,6 @@ public class PlayerController : NetworkBehaviour {
 
 		direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 		rb.velocity = (direction * speed * Time.deltaTime);
-		//trans.Translate(direction.normalized * speed * Time.deltaTime, Space.World);
 	}
 
 	[Command]
@@ -93,18 +114,30 @@ public class PlayerController : NetworkBehaviour {
 
 	[Command]
 	private void CmdChangePlayerColor(int id){
-			Blackboard.instance.players[id].GetComponent<PlayerController>().GetBody().gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
-			Blackboard.instance.players[id].GetComponent<PlayerController>().GetJewel().GetComponent<SpriteRenderer>().color = Color.blue;
-			ParticleSystem.MainModule settings = Blackboard.instance.players[id].GetComponent<PlayerController>().GetLigth().GetComponent<ParticleSystem>().main;
- 			settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
+		for (int i = 0; i < Blackboard.instance.players.Count; i++){
+			if (Blackboard.instance.players[i] != null && Blackboard.instance.players[i].GetComponent<PlayerController>().GetId() == 2){
+				Blackboard.instance.players[i].GetComponent<PlayerController>().GetBody().gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+				Blackboard.instance.players[i].GetComponent<PlayerController>().GetJewel().GetComponent<SpriteRenderer>().color = Color.blue;
+				ParticleSystem.MainModule settings = Blackboard.instance.players[i].GetComponent<PlayerController>().GetLigth().GetComponent<ParticleSystem>().main;
+ 				settings.startColor = new ParticleSystem.MinMaxGradient( Color.blue );
+
+				Blackboard.instance.players[i].GetComponent<PlayerController>().GetHealth().RpcSpawn(2);
+			}
+		}
 	}
 
 	public override void OnStartLocalPlayer(){
+		health = GetComponent<Health>();
+		Blackboard.instance.players.Add(gameObject);
+		
 		if (isServer){
 			pId = 1;
 		}
-		else
+		else{
 			pId = 2;
+		}
+		Blackboard.instance.player1Wins = 0;
+		Blackboard.instance.player2Wins = 0;
 
 		if (pId == 2){
 			bodyTrans.gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
@@ -115,10 +148,9 @@ public class PlayerController : NetworkBehaviour {
 			CmdChangePlayerColor(id);
 		}
 		
-		health = GetComponent<Health>();
 
 		CameraController.instance.Set(trans);
-		health.RpcSpawn(pId);
+		
 	}
 
 	public Transform GetBody(){
@@ -131,6 +163,10 @@ public class PlayerController : NetworkBehaviour {
 
 	public GameObject GetLigth(){
 		return ligth;
+	}
+
+	public Health GetHealth(){
+		return health;
 	}
 
 	public int GetId(){
