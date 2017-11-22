@@ -24,8 +24,11 @@ public class PlayerController : NetworkBehaviour {
 	private int tower1;
 	private int tower2;
 	private Rigidbody2D rb;
-	private Text wins;
-	private Text lost;
+	private Text winsText;
+	private int wins;
+	private Text lostText;
+	[SyncVar(hook = "RestarTowers")]
+	private int lost;
 	private Text tower1d;
 	private Text tower2d;
 
@@ -34,14 +37,15 @@ public class PlayerController : NetworkBehaviour {
 	void Start () {
 		trans = transform;
 		bodyTrans = trans.Find("Body").transform;
-		wins = GameObject.Find("WinText").GetComponent<Text>();
-		lost = GameObject.Find("LostText").GetComponent<Text>();
+		winsText = GameObject.Find("WinText").GetComponent<Text>();
+		lostText = GameObject.Find("LostText").GetComponent<Text>();
 		tower1d = GameObject.Find("Tower1Text").GetComponent<Text>();
 		tower2d = GameObject.Find("Tower2Text").GetComponent<Text>();
 		tower1 = 10;
 		tower2 = 5;
-		//Blackboard.instance.player1Wins = 0;
-		//Blackboard.instance.player2Wins = 0;
+		wins = 0;
+		lost = 0;
+
 		rb = GetComponent<Rigidbody2D>();
 		
 		if (isServer){
@@ -58,18 +62,11 @@ public class PlayerController : NetworkBehaviour {
 		if (!isLocalPlayer)
 			return;
 
-		/*if (pId == 1){
-			wins.text = "Wins: " + Blackboard.instance.player1Wins.ToString();
-			lost.text = "Lost: " + Blackboard.instance.player2Wins.ToString();
-		}
-		else{
-			wins.text = "Wins: " + Blackboard.instance.player2Wins.ToString();
-			lost.text = "Lost: " + Blackboard.instance.player1Wins.ToString();
-		}*/
-
 		tower1d.text = "Tower1: " + tower1.ToString();
 		tower2d.text = "Tower2: " + tower2.ToString();
-
+		winsText.text = "Wins: " + wins.ToString();
+		lostText.text = "Lost: " + lost.ToString();
+		
 		Movement();
 
 		if (Input.GetMouseButtonDown(0)){
@@ -175,8 +172,16 @@ public class PlayerController : NetworkBehaviour {
 		return pId;
 	}
 
-	public void RestarTowers(){
+	public void RestarTowers(int lost){
 		tower1 = 10;
 		tower2 = 5;
+	}
+
+	public void AddWin(){
+		wins++;
+	}
+
+	public void AddLost(){
+		lost++;
 	}
 }

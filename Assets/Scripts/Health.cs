@@ -37,9 +37,10 @@ public class Health : NetworkBehaviour {
 
 		currentHealth -= dmg;
 		if (currentHealth <= 0){
-			if (gameObject.tag == "Player"){
-				RpcRespawn(player.GetId());
-			}
+			if (gameObject.tag == "Player1")
+				RpcRespawn(1);
+			else if (gameObject.tag == "Player2")
+				RpcRespawn(2);
 			else
 				Destroy(gameObject);
 		}
@@ -60,17 +61,18 @@ public class Health : NetworkBehaviour {
 		Vector3 spawnPoint = Vector3.zero;
 
 		if (id == 1){
-			Blackboard.instance.player2Wins++;
 			spawnPoint = spawnPoint1.transform.position;
+			GameObject.FindWithTag("Player2").GetComponent<PlayerController>().AddWin();
+			GameObject.FindWithTag("Player1").GetComponent<PlayerController>().AddLost();
 		}
 		else{
-			Blackboard.instance.player1Wins++;
 			spawnPoint = spawnPoint2.transform.position;
+			GameObject.FindWithTag("Player1").GetComponent<PlayerController>().AddWin();
+			GameObject.FindWithTag("Player2").GetComponent<PlayerController>().AddLost();
 		}
 
 		transform.position = spawnPoint;
 		currentHealth = maxHealth;
-		player.RestarTowers();
 	}
 
 	[ClientRpc]
